@@ -1,0 +1,297 @@
+<?php
+
+/**
+ * GetStarted
+ *
+ * By Nico Knoll (http://nico.is/)
+ *
+ */
+
+class GetStarted extends WireData implements Module, ConfigurableModule {
+
+	public static function getModuleInfo() {
+		return array(
+			'title' => 'GetStarted',
+			'version' => '1.0.0',
+			'summary' => __('Adds short instroductions to Process pages.'),
+			'autoload' => true
+		);
+	}
+
+	static public function getDefaultConfig() {
+		return array(
+			'textboxes' => array(
+				'home' => 1,
+				'field' => 1,
+				'template' => 1,
+				'page' => 1,
+				'language' => 1
+			)
+		);
+	}
+	
+	public function __construct() {
+		foreach(self::getDefaultConfig() as $key => $value) {
+			$this->$key = $value;
+		}
+	}
+
+
+	public function init() {
+		if($this->input->get->render != '') return;
+		
+		if($this->input->get->closeTextbox) $this->closeTextbox($this->sanitizer->text($this->input->get->closeTextbox));
+					
+		$this->config->styles->add($this->config->urls->GetStarted.'GetStarted.css');
+
+		$this->addHook('ProcessPageList::execute', $this, 'addTextboxHome');
+		$this->addHook('ProcessField::execute', $this, 'addTextboxField');
+		$this->addHook('ProcessTemplate::execute', $this, 'addTextboxTemplate');
+		$this->addHook('ProcessPageAdd::execute', $this, 'addTextboxPageAdd');
+		
+		$this->addHook('ProcessLanguage::execute', $this, 'addTextboxLanguage');
+	}
+
+
+
+
+	/* Generic */
+
+	public function addTextboxHome(HookEvent $event) {
+		
+	 	$label = 'Welcome to ProcessWire!';	
+	 	$content = '
+	 		<b>Thanks for choosing ProcessWire!</b>
+	 		<p class="description">The following texts and links will help you to get an easier start.</p>
+	 		
+	 		
+	 		<div class="box">
+		 		<p><b class="boxlabel">What to do now?</b></p>
+	 			<p>If you\'re using ProcessWire for the first time the links on the right side will help you to understand how the system works and guide you to your first viewable page.</p>
+	 			<p>After finishing all the steps you can just <a href="'.$this->config->urls->admin.'module/edit?name=GetStarted'.'">uninstall</a> this module.</p>
+	 		</div>
+	 			
+
+			<div class="box">
+			 	<p><b class="boxlabel">Basic walkthrough</b></p>
+			 	<p>
+				 	<ul>
+				 		<li><a href="'.$this->config->urls->admin.'setup/field/?showInfo=1">Create a field</a></li>
+				 		<li><a href="'.$this->config->urls->admin.'setup/template/?showInfo=1">Create a template</a> and add the field to it</li>
+				 		<li><a href="'.$this->config->urls->admin.'page/add/?parent_id=1&showInfo=1">Create a page</a> using this template</li>
+					 	<li><a href="'.$this->config->urls->admin.'setup/template/?showInfo=1">Create a template file</a> to display the page</li>
+				 	</ul>
+				</p>
+			</div>
+			
+			<div class="box">
+			 	<p><b class="boxlabel">Learn more</b></p>
+			 	<p>
+				 	<ul>
+				 		<li><a href="http://processwire.com/docs/tutorials/" target="_blank">Tutorials</a> </li>
+				 		<li><a href="http://modules.processwire.com/" target="_blank">Find new modules</a></li>
+				 		<li><a href="https://processwire.com/talk/" target="_blank">Get answers in the forum</a></li>
+				 	</ul>
+				</p>
+			</div>
+		 ';
+
+ 		
+ 		// inject it into the return
+		$event->return = $this->markupTextbox('home', $label, $content).$event->return;
+	}
+	
+	
+	
+	public function addTextboxField(HookEvent $event) {
+		
+		$label = 'Get started with fields.';	
+		$content = '
+			<div class="box nomargin">
+				<p><b class="boxlabel">What are fields?</b></p>
+			 	<p>All fields ("Inputfields") in ProcessWire are custom fields defined by the user. Every field has a type (called "Fieldtype") which determines the possible input. ProcessWire includes several fieldtypes by default including those that support text, numbers, files, images, page references, URLs, email addresses, dates and comments. Additional fieldtypes are available as <a href="http://modules.processwire.com/categories/fieldtype/" target="_blank">3rd party modules</a>.</p>
+			</div>
+
+			<div class="box nomargin">
+				<p><b class="boxlabel">Learn more about fields</b></p>
+				<p>
+					<ul>
+						
+						<li><a href="http://youtu.be/IHqnLQy9R1A?t=2m34s" target="_blank">Video Tutorial</a> </li>
+						<li><a href="http://processwire.com/docs/tutorials/hello-worlds/page3" target="_blank">Written Tutorial</a> </li>
+						<li><a href="http://modules.processwire.com/categories/fieldtype/" target="_blank">Discover more Fieldtypes</a></li>
+						<li><a href="https://processwire.com/talk/" target="_blank">Get Answers in the Forum</a></li>
+						<li>&nbsp;</li>
+						<li><i>API Documentation: <a href="https://processwire.com/api/variables/fields/" target="_blank">$fields</a></i></li>
+					</ul>
+				</p>
+			</div>
+		 ';
+
+		// inject it into the return
+		$event->return = $this->markupTextbox('field', $label, $content).$event->return;
+	}
+	
+	
+	
+	public function addTextboxTemplate(HookEvent $event) {
+		$label = 'Get started with templates.';	
+		$content = '
+			<div class="box nomargin">
+				<p><b class="boxlabel">What are templates?</b></p>
+			 	<p>Templates in ProcessWire are mainly custom forms made of <a href="'.$this->config->urls->admin.'setup/field/?showInfo=1">custom fields</a>. Every page in ProcessWire is assigned to a template, and a template may be shared among multiple pages. If you\'re editing a page in the backend you will see and be able to edit the fields assigned to the page\'s template.</p>
+
+				<p>It is also the source of access control, caching and other settings shared among pages.</p>
+			</div>
+			
+			<div class="box nomargin">
+			 	<p><b class="boxlabel">How to display a templates?</b></p>
+			 	 <p>Every template has an associated PHP file, referred to as the "template file". It has to lay in "/site/templates/" and has to have the template\'s name. <i>(E.g.: "helloworld.php" is assigned to he template "helloworld")</i>. This file handles the output for any pages assigned to the template.</p>
+
+				<p>The template-file is provided with several <a href="http://processwire.com/api/variables/" target="_blank">API variables</a>. The most notable is the <a href="http://processwire.com/api/variables/page/" target="_blank">$page</a> API variable, which contains all the data of the current page being viewed.</p>
+			 </div>
+	
+			
+			<div class="box nomargin">
+				<p><b class="boxlabel">Learn more about templates</b></p>
+				<p>
+					<ul>
+						
+						<li><a href="http://youtu.be/IHqnLQy9R1A?t=4m29s" target="_blank">Video Tutorial</a> </li>
+						<li><a href="http://processwire.com/docs/tutorials/hello-worlds/page2" target="_blank">Written Tutorial: The Template</a> </li>
+						<li><a href="http://processwire.com/docs/tutorials/hello-worlds/page4" target="_blank">Written Tutorial: The Template File</a> </li>
+						<li><a href="http://processwire.com/api/templates/" target="_blank">More Information About the Template File</a> </li>
+						<li><a href="http://cheatsheet.processwire.com/" target="_blank">API Variables Cheatsheet</a> </li>
+						<li><a href="https://processwire.com/talk/" target="_blank">Get Answers in the Forum</a></li>
+						<li>&nbsp;</li>
+						<li><i>API Documentation: <a href="https://processwire.com/api/variables/templates/" target="_blank">$templates</a></i></li>
+					</ul>
+				</p>
+			</div>
+			
+		 ';
+
+		// inject it into the return
+		$event->return = $this->markupTextbox('template', $label, $content).$event->return;
+	}
+	
+
+	public function addTextboxPageAdd(HookEvent $event) {
+
+		$label = 'Get started with pages.';
+		$content = '
+			<div class="box nomargin">
+				<p><b class="boxlabel">What is a page?</b></p>
+			 	<p>Pages are the foundation of ProcessWire. Almost everything is based on them. Pages are used to store data and make it quickly accessible. Each page is associated to one <a href="'.$this->config->urls->admin.'setup/template/?showInfo=1">template</a> which determines the spectrum of fields that can be used for this page. Pages also contain information about the author, creation date, visibility, status, etc.</p>
+			</div>
+	
+			<div class="box nomargin">
+				<p><b class="boxlabel">Learn more about pages</b></p>
+				<p>
+					<ul>
+						<li><a href="http://youtu.be/IHqnLQy9R1A?t=6m18s" target="_blank">Video Tutorial</a> </li>
+						<li><a href="http://processwire.com/docs/tutorials/hello-worlds/page2" target="_blank">Written Tutorial</a> </li>
+						<li><a href="https://processwire.com/talk/" target="_blank">Get Answers in the Forum</a></li>
+						<li>&nbsp;</li>
+						<li><i>API Documentation: <a href="https://processwire.com/api/variables/page/" target="_blank">$page</a></i></li>
+						<li><i>API Documentation: <a href="https://processwire.com/api/variables/pages/" target="_blank">$pages</a></i></li>
+					</ul>
+				</p>
+			</div>
+		 ';
+		
+		// inject it into the return
+		$event->return = $this->markupTextbox('page', $label, $content).$event->return;
+	}
+	
+	
+	
+	
+	/* Additional */
+	
+	public function addTextboxLanguage(HookEvent $event) {
+	
+		$label = 'Get started with languages.';
+		$content = '
+			<div class="box nomargin">
+				<p><b class="boxlabel">How to add a language?</b></p>
+			 	<p>To translate the admin backend you can use pre-translated <a href="http://modules.processwire.com/categories/language-pack/" target="_blank">Language Packs</a> or translate it yourself. To add Language Packs easier you can use <a href="https://github.com/NicoKnoll/LanguageInstantInstall" target="_blank">this module</a>. </p>
+
+				<p>Each user is associated to one language. You can change this language at "<a href="'.$this->config->urls->admin.'access/users/">Access &rarr; Users &rarr; (username)</a>". Regular visitors of your page are treated as "guest" user so the guest user\'s language will be the default language of your webpage. </p>
+
+				<p>You can change the language <a href="http://processwire.com/api/multi-language-support/multi-language-fields/#getting-and-setting" target="_blank">in runtime</a>.</p>
+
+			</div>
+			<div class="box nomargin">
+				<p><b class="boxlabel">Multi-language fields</b></p>
+			 	<p>To translate a text field you have to change it\'s type e.g. from "Text" to "TextLanguage". This will cause that a subfield for each language is shown when you\'re editing a page. ProcessWire will automatically choose the right subfield regarding the set language for output so you don\'t have to change a lot in your <a href="'.$this->config->urls->admin.'setup/template/?showInfo=1">template files</a>.</p>
+
+<p>You can make other strings in templates or modules translatable, too, by using the <a href="http://processwire.com/api/multi-language-support/code-i18n/" target="_blank">gettext like __() function</a>.
+</p>
+			</div>
+	
+			<div class="box nomargin">
+				<p><b class="boxlabel">Learn more</b></p>
+				<p>
+					<ul>
+						<li><a href="https://www.youtube.com/watch?v=PEetje9obtw" target="_blank">Video Tutorial: __()</a> </li>
+						<li><a href="https://processwire.com/api/multi-language-support/code-i18n/" target="_blank">Written Tutorial: __()</a> </li>
+						<li><a href="https://www.youtube.com/watch?v=eq-9GQCT0lw" target="_blank">Video Tutorial: Multi-language-fields</a> </li>
+						<li><a href="https://processwire.com/api/multi-language-support/multi-language-fields/" target="_blank">Written Tutorial: Multi-language-fields</a> </li>
+						<li><a href="http://modules.processwire.com/categories/language-pack/" target="_blank">Language Packs</a></li>
+						<li><a href="https://processwire.com/talk/" target="_blank">Get Answers in the Forum</a></li>
+						<li>&nbsp;</li>
+						<li><i>API Documentation: <a href="https://processwire.com/api/multi-language-support/" target="_blank">Languages</a></i></li>
+					</ul>
+
+				</p>
+			</div>
+		 ';
+		
+		// inject it into the return
+		$event->return = $this->markupTextbox('language', $label, $content).$event->return;
+	}
+	
+	
+	
+	
+	private function markupTextbox($id, $label, $content) {
+		$fields = new InputfieldWrapper();
+
+		$field = $this->modules->get("InputfieldMarkup");
+		if($this->input->get->showInfo != '1' && @$this->textboxes[$id] == 0) $field->collapsed = Inputfield::collapsedYes;
+		$field->name = 'InfoTextbox';
+		$field->label = $label;
+		$field->skipLabel = Inputfield::skipLabelNo;
+		$field->icon = 'info-circle';
+		$field->value = '<a class="uninstall" style="line-height:10px;position:absolute;bottom:20px;right:20px;z-index:150;font-size:10px;text-transform:uppercase;" href="'.$this->config->urls->admin.'module/edit?name=GetStarted'.'">Uninstall</a>'.$content;
+		$fields->add($field);
+		
+		// keep them closed after first view
+		$this->firstView($id);
+		
+		return $fields->render();
+	}
+	
+	
+	
+	private function firstView($id) {
+		$data = self::getDefaultConfig();
+		$configData = $this->modules->getModuleConfigData($this);
+		$dataTextboxes = array_merge($data['textboxes'], (array)@$configData['textboxes']);
+		
+		if(in_array($id, array_keys($dataTextboxes))) $dataTextboxes[$id] = 0;
+		
+		$data['textboxes'] = $dataTextboxes;
+
+		$this->textboxes = $dataTextboxes;
+		$this->modules->saveModuleConfigData($this, $data);
+	}
+	
+	
+		
+	static public function getModuleConfigInputfields(array $data) {
+		return new InputfieldWrapper();
+	}
+
+}

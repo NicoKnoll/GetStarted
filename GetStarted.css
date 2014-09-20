@@ -1,0 +1,83 @@
+#Inputfield_InfoTextbox {
+	position:relative;
+	margin-bottom:30px;
+}
+
+#Inputfield_InfoTextbox .description {
+	margin-top:0px;
+	color:#888;
+}
+
+#Inputfield_InfoTextbox ul {
+	margin:0em 0px;
+}
+
+#Inputfield_InfoTextbox li {
+	margin:0px;
+}
+ 
+#Inputfield_InfoTextbox s {
+	color:#888;
+}
+
+#Inputfield_InfoTextbox .box {
+	margin:20px 0px 0px;
+	width:300px;
+	float:left;
+	margin-right:50px;
+}
+
+#Inputfield_InfoTextbox .box.nomargin {
+margin-top:0px;
+margin-bottom:0px;
+}
+
+#Inputfield_InfoTextbox .box.halffull {
+width:50%;
+margin:0px;
+}
+
+
+#Inputfield_InfoTextbox:not(.InputfieldStateCollapsed) > label {
+	color: transparent;
+	margin-bottom: -25px;
+	z-index: 2;
+	position: relative;
+}
+
+
+
+#Inputfield_InfoTextbox .box p {
+	margin-top:0px;
+	margin-bottom:0px;
+}
+
+#Inputfield_InfoTextbox .box p + p {
+	margin-top:16px;
+}
+
+#Inputfield_InfoTextbox .fa {
+	//display:none;
+}
+
+#Inputfield_InfoTextbox .inactive {
+	opacity:0.5;
+}
+
+#Inputfield_InfoTextbox .boxclose {
+	display:block;
+	position:absolute;
+	top:20px;
+	right:20px;
+	font-size:26px;
+	line-height: 14px;
+	color:#888;
+}
+
+#Inputfield_InfoTextbox .boxclose:hover {
+	color:inherit;
+}
+
+
+
+
